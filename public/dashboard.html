@@ -878,12 +878,12 @@
                 } else if (response.ok) {
                     container.innerHTML = '<p>No passwords stored yet.</p>';
                 } else {
-                    showMessage(data.message || 'Error loading passwords', 'error');
+                    //showMessage(data.message || 'Error loading passwords', 'error');
                 }
             } catch (error) {
                 console.error('loadPasswords error:', error);
                 loading.style.display = 'none';
-                showMessage('Error loading passwords: ' + error.message, 'error');
+                //showMessage('Error loading passwords: ' + error.message, 'error');
             }
         }
 
