@@ -10,21 +10,9 @@ const logger = require('./utils/logger')
 
 const app = express()
 
-// Enable CORS
-const allowedOrigins = process.env.VERCEL 
-    ? [process.env.VERCEL_URL, 'https://securevault.vercel.app'] 
-    : ['http://localhost:3000']
-
+// Enable CORS - Allow all origins in production (same domain), localhost in dev
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin) return callback(null, true)
-        if (allowedOrigins.some(allowed => origin.includes(allowed))) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
-    },
+    origin: true, // Allow all origins (since frontend and backend are on same domain)
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -40,6 +28,15 @@ app.use('/api', mainRouter)
 
 // Static files served last
 app.use(express.static(path.join(__dirname, 'public')))
+
+// Catch-all for SPA - serve index.html for non-API routes
+app.get('*', (req, res) => {
+    // Don't intercept API routes
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'API endpoint not found' })
+    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
 
 const PORT = process.env.PORT || 3000
 
