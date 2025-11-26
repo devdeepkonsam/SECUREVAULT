@@ -699,7 +699,10 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000';
+        // Automatically detect API URL based on environment
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : window.location.origin;
         const CLERK_PUBLISHABLE_KEY = 'pk_test_cHJpbWUtc2xvdGgtNzYuY2xlcmsuYWNjb3VudHMuZGV2JA';
         let clerkInstance;
         let sessionToken;
