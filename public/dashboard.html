@@ -299,6 +299,14 @@
             background: #c82333;
         }
 
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
         .btn-info {
             background: #17a2b8;
         }
@@ -863,9 +871,9 @@
                             <p><strong>Password:</strong> <span class="password-hidden" id="pwd-${pwd._id}">••••••••</span> 
                             <button class="btn-toggle" onclick="togglePassword('${pwd._id}')" id="btn-${pwd._id}">👁️</button>
                             <button class="btn-copy" onclick="copyPasswordById('${pwd._id}')">📋</button></p>
-                            <div class="password-actions">
+                            <div class="password-actions" id="actions-${pwd._id}">
                                 <button class="btn-small btn-warning" onclick="editPassword('${pwd._id}')">✏️ Edit</button>
-                                <button class="btn-small btn-danger" onclick="deletePassword('${pwd._id}')">🗑️ Delete</button>
+                                <button class="btn-small btn-danger" onclick="showDeleteConfirmation('${pwd._id}', 'password')">🗑️ Delete</button>
                             </div>
                         `;
                         container.appendChild(item);
@@ -1024,9 +1032,23 @@
             showMessage(`${label} copied to clipboard!`);
         }
 
+        function showDeleteConfirmation(id, type) {
+            const actionsDiv = document.getElementById(`actions-${id}`);
+            actionsDiv.innerHTML = `
+                <button class="btn-small btn-danger" onclick="confirmDelete('${id}', '${type}')">✓ Confirm Delete</button>
+                <button class="btn-small btn-secondary" onclick="${type === 'password' ? 'loadPasswords()' : 'loadCards()'}">✕ Cancel</button>
+            `;
+        }
+
+        async function confirmDelete(id, type) {
+            if (type === 'password') {
+                await deletePassword(id);
+            } else if (type === 'card') {
+                await deleteCard(id);
+            }
+        }
+
         async function deletePassword(id) {
-            if (!confirm('Are you sure you want to delete this password?')) return;
-            
             try {
                 const headers = await getAuthHeaders();
                 const response = await fetch(`${API_URL}/passwords/removePassword/${id}`, {
@@ -1150,9 +1172,9 @@
                             <button class="btn-copy" onclick="copyCardCVV('${card._id}')">📋</button></p>
                             <p><strong>Type:</strong> ${card.cardType}</p>
                             ${card.notes ? `<p><strong>Notes:</strong> ${card.notes}</p>` : ''}
-                            <div class="password-actions">
+                            <div class="password-actions" id="actions-${card._id}">
                                 <button class="btn-small btn-warning" onclick="editCard('${card._id}')">✏️ Edit</button>
-                                <button class="btn-small btn-danger" onclick="deleteCard('${card._id}')">🗑️ Delete</button>
+                                <button class="btn-small btn-danger" onclick="showDeleteConfirmation('${card._id}', 'card')">🗑️ Delete</button>
                             </div>
                         `;
                         container.appendChild(item);
@@ -1311,8 +1333,6 @@
         }
 
         async function deleteCard(cardId) {
-            if (!confirm('Are you sure you want to delete this card?')) return;
-            
             try {
                 const headers = await getAuthHeaders();
                 const response = await fetch(`${API_URL}/cards/deleteCard/${cardId}`, {
