@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 
 const logger = require('../utils/logger')
 
-mongoose.connect(process.env.URL, {
+const mongoURL = process.env.URL || process.env.MONGODB_URI
+if (!mongoURL) {
+    console.error('MongoDB connection string not found in environment variables')
+    process.exit(1)
+}
+
+mongoose.connect(mongoURL, {
     useNewUrlParser: true,
 })
 
