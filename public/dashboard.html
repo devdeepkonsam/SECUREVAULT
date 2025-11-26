@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SecureVault</title>
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_cHJpbWUtc2xvdGgtNzYuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://prime-sloth-76.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <style>
+        :root {
+            --bg-gradient-1: #667eea;
+            --bg-gradient-2: #764ba2;
+            --container-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --card-bg: #f8f9fa;
+            --accent-color: #667eea;
+            --accent-hover: #5568d3;
+        }
+
+        body.dark-mode {
+            --bg-gradient-1: #1a1a2e;
+            --bg-gradient-2: #16213e;
+            --container-bg: #0f1419;
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --border-color: #2d3748;
+            --card-bg: #1a202c;
+            --accent-color: #667eea;
+            --accent-hover: #5568d3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 2.5em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .profile-name {
+            color: var(--text-primary);
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+        }
+
+        .theme-toggle {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .tab:hover {
+            color: var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: var(--container-bg);
+            color: var(--text-primary);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: var(--accent-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .password-list {
+            margin-top: 20px;
+        }
+
+        .password-item {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .password-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .password-item h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .password-item p {
+            color: var(--text-secondary);
+            margin: 5px 0;
+        }
+
+        .password-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 15px;
+            font-size: 14px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        h2, h3 {
+            color: var(--text-primary);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        body.dark-mode .message.success {
+            background: #1e4620;
+            color: #4ade80;
+            border: 1px solid #22c55e;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        body.dark-mode .message.error {
+            background: #4a1a1a;
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+
+        .generated-password {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        body.dark-mode .generated-password {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .generated-password h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        body.dark-mode .generated-password h3 {
+            color: var(--accent-color);
+        }
+
+        .generated-password code {
+            background: white;
+            padding: 10px;
+            display: block;
+            border-radius: 5px;
+            font-size: 18px;
+            color: #333;
+            word-break: break-all;
+        }
+
+        body.dark-mode .generated-password code {
+            background: var(--container-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.dark-mode .modal {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .modal-content {
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #667eea;
+        }
+
+        body.dark-mode .modal-header h2 {
+            color: var(--accent-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        body.dark-mode .close-btn {
+            color: var(--text-secondary);
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        body.dark-mode .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-copy, .btn-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            margin-left: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover, .btn-toggle:hover {
+            background: var(--card-bg);
+            transform: scale(1.1);
+        }
+
+        .password-hidden {
+            font-family: monospace;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .password-visible {
+            font-family: monospace;
+            font-size: 16px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 SecureVault</h1>
+            <div class="user-info">
+                <button class="theme-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <div class="profile-section">
+                    <div class="profile-avatar" id="user-avatar">U</div>
+                    <div class="profile-details">
+                        <span class="profile-name" id="user-name">Loading...</span>
+                        <span class="profile-email" id="user-email">Loading...</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('list')">📋 List Passwords</button>
+            <button class="tab" onclick="showTab('add')">➕ Add Password</button>
+            <button class="tab" onclick="showTab('cards')">💳 Credit Cards</button>
+            <button class="tab" onclick="showTab('generate')">🔑 Generate Password</button>
+        </div>
+
+        <!-- List Passwords Tab -->
+        <div id="list-tab" class="tab-content active">
+            <h2>Stored Passwords</h2>
+            <div class="loading" id="list-loading">
+                <div class="spinner"></div>
+            </div>
+            <div class="password-list" id="password-list"></div>
+        </div>
+
+        <!-- Add Password Tab -->
+        <div id="add-tab" class="tab-content">
+            <h2>Add New Password</h2>
+            <form id="add-form" autocomplete="off">
+                <div class="form-group">
+                    <label>Website/App Name *</label>
+                    <input type="text" id="add-name" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label>Username/Email</label>
+                    <input type="text" id="add-username" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="add-password" autocomplete="new-password" required>
+                </div>
+                <button type="submit">Add Password</button>
+            </form>
+        </div>
+
+        <!-- Generate Password Tab -->
+        <div id="generate-tab" class="tab-content">
+            <h2>Generate Secure Password</h2>
+            <form id="generate-form">
+                <div class="form-group">
+                    <label>Password Length</label>
+                    <input type="number" id="gen-length" value="16" min="8" max="50">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="gen-numbers" checked> Include Numbers
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="gen-symbols" checked> Include Symbols
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="gen-uppercase" checked> Include Uppercase
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="gen-lowercase" checked> Include Lowercase
+                    </label>
+                </div>
+                <button type="submit">Generate Password</button>
+            </form>
+            <div class="generated-password" id="generated-result">
+                <h3>Generated Password:</h3>
+                <code id="generated-password-text"></code>
+                <button onclick="copyPassword()" style="margin-top: 10px;">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Credit Cards Tab -->
+        <div id="cards-tab" class="tab-content">
+            <h2>💳 Credit Cards</h2>
+            <button class="btn-small" onclick="openAddCardModal()" style="margin-bottom: 20px;">➕ Add New Card</button>
+            <div class="loading" id="cards-loading">
+                <div class="spinner"></div>
+            </div>
+            <div class="password-list" id="cards-list"></div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Card Modal -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="card-modal-title">Add Credit Card</h2>
+                <button class="close-btn" onclick="closeCardModal()">×</button>
+            </div>
+            <form id="card-form" autocomplete="off">
+                <input type="hidden" id="card-id">
+                <div class="form-group">
+                    <label>Card Name/Label *</label>
+                    <input type="text" id="card-name" placeholder="e.g., Personal Visa" required>
+                </div>
+                <div class="form-group">
+                    <label>Cardholder Name *</label>
+                    <input type="text" id="card-holder" placeholder="Name on card" required>
+                </div>
+                <div class="form-group">
+                    <label>Card Number *</label>
+                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Expiry Date *</label>
+                        <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>CVV *</label>
+                        <input type="text" id="card-cvv" placeholder="123" maxlength="4" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Card Type</label>
+                    <select id="card-type">
+                        <option value="Visa">Visa</option>
+                        <option value="Mastercard">Mastercard</option>
+                        <option value="American Express">American Express</option>
+                        <option value="Discover">Discover</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="card-notes" rows="3" placeholder="Additional information (optional)"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit">Save Card</button>
+                    <button type="button" onclick="closeCardModal()" style="background: #6c757d;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Password Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Password</h2>
+                <button class="close-btn" onclick="closeEditModal()">×</button>
+            </div>
+            <form id="edit-form" autocomplete="off">
+                <input type="hidden" id="edit-password-id">
+                <div class="form-group">
+                    <label>Old Password *</label>
+                    <input type="password" id="edit-old-password" autocomplete="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label>New Password *</label>
+                    <input type="password" id="edit-new-password" autocomplete="new-password" required>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit">Update Password</button>
+                    <button type="button" onclick="closeEditModal()" style="background: #6c757d;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        const CLERK_PUBLISHABLE_KEY = 'pk_test_cHJpbWUtc2xvdGgtNzYuY2xlcmsuYWNjb3VudHMuZGV2JA';
+        let clerkInstance;
+        let sessionToken;
+
+        // Initialize Clerk and check authentication
+        window.addEventListener('load', async () => {
+            try {
+                await Clerk.load({
+                    publishableKey: CLERK_PUBLISHABLE_KEY
+                });
+                
+                clerkInstance = window.Clerk;
+                
+                // Wait for session to be fully ready
+                let retries = 0;
+                while ((!clerkInstance.session || !clerkInstance.user) && retries < 10) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    retries++;
+                }
+
+                if (!clerkInstance.user || !clerkInstance.session) {
+                    console.log('No active session found');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                // Display user profile
+                const user = clerkInstance.user;
+                const fullName = user.fullName || user.firstName || 'User';
+                const email = user.primaryEmailAddress?.emailAddress || '';
+                const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                
+                document.getElementById('user-name').textContent = fullName;
+                document.getElementById('user-email').textContent = email;
+                document.getElementById('user-avatar').textContent = initials;
+
+                // Load saved theme preference
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('theme-icon').textContent = '☀️';
+                }
+
+                // Get session token to verify it works
+                sessionToken = await clerkInstance.session.getToken();
+                console.log('Session token obtained successfully');
+
+                // Wait a bit more to ensure everything is ready
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Load passwords
+                console.log('About to load passwords, session exists:', !!clerkInstance.session);
+                loadPasswords();
+            } catch (error) {
+                console.error('Clerk initialization error:', error);
+                window.location.href = '/login.html';
+            }
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        async function handleLogout() {
+            await clerkInstance.signOut();
+            window.location.href = '/login.html';
+        }
+
+        async function getAuthHeaders() {
+            try {
+                // Always get fresh reference from window.Clerk
+                const clerk = window.Clerk;
+                
+                if (!clerk) {
+                    console.error('Clerk instance not initialized');
+                    throw new Error('Not authenticated');
+                }
+                
+                // Get fresh session reference
+                if (!clerk.session) {
+                    console.error('No active session');
+                    throw new Error('Not authenticated');
+                }
+                
+                const token = await clerk.session.getToken();
+                console.log('Token retrieved successfully');
+                
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+            } catch (error) {
+                console.error('getAuthHeaders error:', error);
+                throw error;
+            }
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`button[onclick="showTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+
+            if (tab === 'list') {
+                loadPasswords();
+            } else if (tab === 'cards') {
+                loadCards();
+            }
+        }
+
+        function showMessage(text, type = 'success') {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 5000);
+        }
+
+        async function loadPasswords() {
+            const loading = document.getElementById('list-loading');
+            const container = document.getElementById('password-list');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                console.log('Loading passwords...');
+                console.log('Clerk instance:', clerkInstance);
+                console.log('Has session:', !!clerkInstance?.session);
+                
+                const headers = await getAuthHeaders();
+                console.log('Headers obtained, making fetch request');
+                
+                const response = await fetch(`${API_URL}/passwords/listPasswords`, { 
+                    headers,
+                    credentials: 'include'
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                loading.style.display = 'none';
+
+                if (response.ok && data.passwordsData && data.passwordsData.length > 0) {
+                    data.passwordsData.forEach(pwd => {
+                        const item = document.createElement('div');
+                        item.className = 'password-item';
+                        item.innerHTML = `
+                            <h3>${pwd.passwordName || 'N/A'}</h3>
+                            ${pwd.username ? `<p><strong>Username:</strong> ${pwd.username} <button class="btn-copy" onclick="copyToClipboard('${pwd.username}', 'Username')">📋</button></p>` : ''}
+                            <p><strong>Password:</strong> <span class="password-hidden" id="pwd-${pwd._id}">••••••••</span> 
+                            <button class="btn-toggle" onclick="togglePassword('${pwd._id}')" id="btn-${pwd._id}">👁️</button>
+                            <button class="btn-copy" onclick="copyPasswordById('${pwd._id}')">📋</button></p>
+                            <div class="password-actions">
+                                <button class="btn-small btn-warning" onclick="editPassword('${pwd._id}')">✏️ Edit</button>
+                                <button class="btn-small btn-danger" onclick="deletePassword('${pwd._id}')">🗑️ Delete</button>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                } else if (response.ok) {
+                    container.innerHTML = '<p>No passwords stored yet.</p>';
+                } else {
+                    showMessage(data.message || 'Error loading passwords', 'error');
+                }
+            } catch (error) {
+                console.error('loadPasswords error:', error);
+                loading.style.display = 'none';
+                showMessage('Error loading passwords: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('add-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                passwordName: document.getElementById('add-name').value,
+                username: document.getElementById('add-username').value,
+                password: document.getElementById('add-password').value
+            };
+
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/passwords/addPassword`, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Password added successfully!');
+                    document.getElementById('add-form').reset();
+                    showTab('list');
+                } else {
+                    showMessage(result.message || 'Error adding password', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('generate-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                passwordLength: parseInt(document.getElementById('gen-length').value)
+            };
+
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/passwords/passwordGenerator`, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.generatedPassword) {
+                    document.getElementById('generated-password-text').textContent = result.generatedPassword;
+                    document.getElementById('generated-result').style.display = 'block';
+                } else {
+                    showMessage('Error generating password', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        const passwordCache = {};
+
+        async function togglePassword(id) {
+            const passwordSpan = document.getElementById(`pwd-${id}`);
+            const toggleBtn = document.getElementById(`btn-${id}`);
+            
+            if (passwordSpan.classList.contains('password-visible')) {
+                // Hide password
+                passwordSpan.textContent = '••••••••';
+                passwordSpan.classList.remove('password-visible');
+                passwordSpan.classList.add('password-hidden');
+                toggleBtn.textContent = '👁️';
+            } else {
+                // Show password
+                if (passwordCache[id]) {
+                    passwordSpan.textContent = passwordCache[id];
+                    passwordSpan.classList.remove('password-hidden');
+                    passwordSpan.classList.add('password-visible');
+                    toggleBtn.textContent = '🙈';
+                } else {
+                    try {
+                        const headers = await getAuthHeaders();
+                        const response = await fetch(`${API_URL}/passwords/passwordDetails/${id}`, {
+                            method: 'POST',
+                            headers: headers,
+                            credentials: 'include',
+                            body: JSON.stringify({})
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok && result.password) {
+                            passwordCache[id] = result.password;
+                            passwordSpan.textContent = result.password;
+                            passwordSpan.classList.remove('password-hidden');
+                            passwordSpan.classList.add('password-visible');
+                            toggleBtn.textContent = '🙈';
+                        } else {
+                            showMessage(result.message || 'Error viewing password', 'error');
+                        }
+                    } catch (error) {
+                        showMessage('Error: ' + error.message, 'error');
+                    }
+                }
+            }
+        }
+
+        async function copyPasswordById(id) {
+            if (passwordCache[id]) {
+                navigator.clipboard.writeText(passwordCache[id]);
+                showMessage('Password copied to clipboard!');
+            } else {
+                try {
+                    const headers = await getAuthHeaders();
+                    const response = await fetch(`${API_URL}/passwords/passwordDetails/${id}`, {
+                        method: 'POST',
+                        headers: headers,
+                        credentials: 'include',
+                        body: JSON.stringify({})
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.password) {
+                        passwordCache[id] = result.password;
+                        navigator.clipboard.writeText(result.password);
+                        showMessage('Password copied to clipboard!');
+                    } else {
+                        showMessage(result.message || 'Error copying password', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                }
+            }
+        }
+
+        function copyToClipboard(text, label) {
+            navigator.clipboard.writeText(text);
+            showMessage(`${label} copied to clipboard!`);
+        }
+
+        async function deletePassword(id) {
+            if (!confirm('Are you sure you want to delete this password?')) return;
+            
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/passwords/removePassword/${id}`, {
+                    method: 'DELETE',
+                    headers: headers,
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Password deleted successfully!');
+                    loadPasswords();
+                } else {
+                    showMessage(result.message || 'Error deleting password', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        function copyPassword() {
+            const text = document.getElementById('generated-password-text').textContent;
+            navigator.clipboard.writeText(text);
+            showMessage('Password copied to clipboard!');
+        }
+
+        function editPassword(id) {
+            document.getElementById('edit-password-id').value = id;
+            document.getElementById('edit-modal').classList.add('show');
+            document.getElementById('edit-form').reset();
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('show');
+            document.getElementById('edit-form').reset();
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const passwordId = document.getElementById('edit-password-id').value;
+            const data = {
+                oldPassword: document.getElementById('edit-old-password').value,
+                newPassword: document.getElementById('edit-new-password').value
+            };
+
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/passwords/editPassword/${passwordId}`, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Password updated successfully!');
+                    closeEditModal();
+                    loadPasswords();
+                } else {
+                    showMessage(result.message || 'Error updating password', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('edit-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'edit-modal') {
+                closeEditModal();
+            }
+        });
+
+        // Credit Card Functions
+        function openAddCardModal() {
+            document.getElementById('card-modal-title').textContent = 'Add Credit Card';
+            document.getElementById('card-form').reset();
+            document.getElementById('card-id').value = '';
+            document.getElementById('card-modal').classList.add('show');
+        }
+
+        function closeCardModal() {
+            document.getElementById('card-modal').classList.remove('show');
+            document.getElementById('card-form').reset();
+        }
+
+        async function loadCards() {
+            const loading = document.getElementById('cards-loading');
+            const container = document.getElementById('cards-list');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/cards/listCards`, { 
+                    headers,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+
+                if (response.ok && data.cardsData && data.cardsData.length > 0) {
+                    data.cardsData.forEach(card => {
+                        const item = document.createElement('div');
+                        item.className = 'password-item';
+                        item.innerHTML = `
+                            <h3>💳 ${card.cardName}</h3>
+                            <p><strong>Cardholder:</strong> ${card.cardholderName}</p>
+                            <p><strong>Number:</strong> <span id="card-num-${card._id}">••••  ••••  ••••  ••••</span> 
+                            <button class="btn-toggle" onclick="toggleCardNumber('${card._id}')" id="card-btn-${card._id}">👁️</button>
+                            <button class="btn-copy" onclick="copyCardNumber('${card._id}')">📋</button></p>
+                            <p><strong>Expiry:</strong> <span id="card-exp-${card._id}">${card.expiryDate}</span></p>
+                            <p><strong>CVV:</strong> <span id="card-cvv-${card._id}">•••</span> 
+                            <button class="btn-toggle" onclick="toggleCardCVV('${card._id}')" id="cvv-btn-${card._id}">👁️</button>
+                            <button class="btn-copy" onclick="copyCardCVV('${card._id}')">📋</button></p>
+                            <p><strong>Type:</strong> ${card.cardType}</p>
+                            ${card.notes ? `<p><strong>Notes:</strong> ${card.notes}</p>` : ''}
+                            <div class="password-actions">
+                                <button class="btn-small btn-warning" onclick="editCard('${card._id}')">✏️ Edit</button>
+                                <button class="btn-small btn-danger" onclick="deleteCard('${card._id}')">🗑️ Delete</button>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                } else if (response.ok) {
+                    container.innerHTML = '<p>No credit cards stored yet.</p>';
+                } else {
+                    showMessage(data.message || 'Error loading cards', 'error');
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                showMessage('Error loading cards: ' + error.message, 'error');
+            }
+        }
+
+        // Card details cache
+        const cardCache = {};
+
+        async function toggleCardNumber(cardId) {
+            const span = document.getElementById(`card-num-${cardId}`);
+            const btn = document.getElementById(`card-btn-${cardId}`);
+            
+            if (span.textContent.includes('••••')) {
+                if (!cardCache[cardId]) {
+                    try {
+                        const headers = await getAuthHeaders();
+                        const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                            headers,
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (response.ok && data.card) {
+                            cardCache[cardId] = data.card;
+                        } else {
+                            showMessage('Error loading card details', 'error');
+                            return;
+                        }
+                    } catch (error) {
+                        showMessage('Error: ' + error.message, 'error');
+                        return;
+                    }
+                }
+                span.textContent = cardCache[cardId].cardNumber.match(/.{1,4}/g).join('  ');
+                btn.textContent = '🙈';
+            } else {
+                span.textContent = '••••  ••••  ••••  ••••';
+                btn.textContent = '👁️';
+            }
+        }
+
+        async function toggleCardCVV(cardId) {
+            const span = document.getElementById(`card-cvv-${cardId}`);
+            const btn = document.getElementById(`cvv-btn-${cardId}`);
+            
+            if (span.textContent === '•••') {
+                if (!cardCache[cardId]) {
+                    try {
+                        const headers = await getAuthHeaders();
+                        const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                            headers,
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (response.ok && data.card) {
+                            cardCache[cardId] = data.card;
+                        } else {
+                            showMessage('Error loading card details', 'error');
+                            return;
+                        }
+                    } catch (error) {
+                        showMessage('Error: ' + error.message, 'error');
+                        return;
+                    }
+                }
+                span.textContent = cardCache[cardId].cvv;
+                btn.textContent = '🙈';
+            } else {
+                span.textContent = '•••';
+                btn.textContent = '👁️';
+            }
+        }
+
+        async function copyCardNumber(cardId) {
+            if (!cardCache[cardId]) {
+                try {
+                    const headers = await getAuthHeaders();
+                    const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                        headers,
+                        credentials: 'include'
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.card) {
+                        cardCache[cardId] = data.card;
+                    } else {
+                        showMessage('Error loading card details', 'error');
+                        return;
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                    return;
+                }
+            }
+            copyToClipboard(cardCache[cardId].cardNumber, 'Card number');
+        }
+
+        async function copyCardCVV(cardId) {
+            if (!cardCache[cardId]) {
+                try {
+                    const headers = await getAuthHeaders();
+                    const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                        headers,
+                        credentials: 'include'
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.card) {
+                        cardCache[cardId] = data.card;
+                    } else {
+                        showMessage('Error loading card details', 'error');
+                        return;
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                    return;
+                }
+            }
+            copyToClipboard(cardCache[cardId].cvv, 'CVV');
+        }
+
+        async function editCard(cardId) {
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                    headers,
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                if (response.ok && data.card) {
+                    const card = data.card;
+                    document.getElementById('card-modal-title').textContent = 'Edit Credit Card';
+                    document.getElementById('card-id').value = cardId;
+                    document.getElementById('card-name').value = card.cardName;
+                    document.getElementById('card-holder').value = card.cardholderName;
+                    document.getElementById('card-number').value = card.cardNumber;
+                    document.getElementById('card-expiry').value = card.expiryDate;
+                    document.getElementById('card-cvv').value = card.cvv;
+                    document.getElementById('card-type').value = card.cardType;
+                    document.getElementById('card-notes').value = card.notes || '';
+                    document.getElementById('card-modal').classList.add('show');
+                } else {
+                    showMessage(data.message || 'Error loading card details', 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading card: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCard(cardId) {
+            if (!confirm('Are you sure you want to delete this card?')) return;
+            
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${API_URL}/cards/deleteCard/${cardId}`, {
+                    method: 'DELETE',
+                    headers,
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage('Card deleted successfully!');
+                    loadCards();
+                } else {
+                    showMessage(data.message || 'Error deleting card', 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting card: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('card-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const cardData = {
+                cardName: document.getElementById('card-name').value,
+                cardholderName: document.getElementById('card-holder').value,
+                cardNumber: document.getElementById('card-number').value.replace(/\s/g, ''),
+                expiryDate: document.getElementById('card-expiry').value,
+                cvv: document.getElementById('card-cvv').value,
+                cardType: document.getElementById('card-type').value,
+                notes: document.getElementById('card-notes').value
+            };
+
+            try {
+                const headers = await getAuthHeaders();
+                const cardId = document.getElementById('card-id').value;
+                let response;
+
+                if (cardId === '') {
+                    response = await fetch(`${API_URL}/cards/addCard`, {
+                        method: 'POST',
+                        headers: { ...headers, 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(cardData)
+                    });
+                } else {
+                    response = await fetch(`${API_URL}/cards/updateCard/${cardId}`, {
+                        method: 'PUT',
+                        headers: { ...headers, 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(cardData)
+                    });
+                }
+
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(cardId === '' ? 'Card added successfully!' : 'Card updated successfully!');
+                    closeCardModal();
+                    loadCards();
+                } else {
+                    showMessage(data.message || 'Error saving card', 'error');
+                }
+            } catch (error) {
+                showMessage('Error saving card: ' + error.message, 'error');
+            }
+        });
+
+        // Format card number input
+        document.getElementById('card-number').addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\s/g, '');
+            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formatted;
+        });
+
+        // Format expiry date input
+        document.getElementById('card-expiry').addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Close card modal when clicking outside
+        document.getElementById('card-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'card-modal') {
+                closeCardModal();
+            }
+        });
+
+        // Load passwords on page load
+        loadPasswords();
+    </script>
+</body>
+</html>

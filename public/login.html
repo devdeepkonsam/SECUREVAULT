@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SecureVault</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px 30px 30px 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1em;
+        }
+
+        #clerk-signin {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #clerk-signin > div {
+            width: 100%;
+        }
+
+        .features {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 0;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .feature {
+            text-align: center;
+            flex: 1;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            color: #888;
+            font-size: 0.85em;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">🔐</div>
+        <h1>SecureVault</h1>
+        <p class="subtitle">Your Personal Password Manager</p>
+        
+        <div id="clerk-signin"></div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-text">AES-256<br>Encryption</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👤</div>
+                <div class="feature-text">Personal &<br>Secure</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">☁️</div>
+                <div class="feature-text">Cloud<br>Synced</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Protected by Clerk Authentication
+        </div>
+    </div>
+
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_cHJpbWUtc2xvdGgtNzYuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://prime-sloth-76.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+
+    <script>
+        window.addEventListener('load', async () => {
+            const publishableKey = 'pk_test_cHJpbWUtc2xvdGgtNzYuY2xlcmsuYWNjb3VudHMuZGV2JA';
+            
+            try {
+                await Clerk.load({
+                    publishableKey: publishableKey
+                });
+
+                const signInDiv = document.getElementById('clerk-signin');
+                
+                Clerk.mountSignIn(signInDiv, {
+                    afterSignInUrl: '/dashboard.html',
+                    appearance: {
+                        elements: {
+                            rootBox: 'w-full',
+                            card: 'shadow-none'
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Clerk loading error:', error);
+                document.getElementById('clerk-signin').innerHTML = '<p style="color: red;">Authentication service error. Please check console.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
