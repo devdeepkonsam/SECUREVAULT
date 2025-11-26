@@ -11,8 +11,20 @@ const logger = require('./utils/logger')
 const app = express()
 
 // Enable CORS
+const allowedOrigins = process.env.VERCEL 
+    ? [process.env.VERCEL_URL, 'https://securevault.vercel.app'] 
+    : ['http://localhost:3000']
+
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true)
+        if (allowedOrigins.some(allowed => origin.includes(allowed))) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -28,7 +40,13 @@ app.use('/', mainRouter)
 
 const PORT = process.env.PORT || 3000
 
-app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`)
-    logger.log('info', `Server is running on ${PORT}`)
-})
+// For Vercel serverless deployment
+if (process.env.VERCEL) {
+    module.exports = app
+} else {
+    // For local development
+    app.listen(PORT, () => {
+        console.log(`Server is running on ${PORT}`)
+        logger.log('info', `Server is running on ${PORT}`)
+    })
+}
