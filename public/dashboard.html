@@ -1204,15 +1204,20 @@
                 if (!cardCache[cardId]) {
                     try {
                         const headers = await getAuthHeaders();
-                        const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                        const response = await fetch(`${API_URL}/cards/cardDetails/${cardId}`, {
+                            method: 'POST',
                             headers,
                             credentials: 'include'
                         });
                         const data = await response.json();
-                        if (response.ok && data.card) {
-                            cardCache[cardId] = data.card;
+                        if (response.ok && data.success) {
+                            cardCache[cardId] = {
+                                cardNumber: data.cardNumber,
+                                cvv: data.cvv,
+                                expiryDate: data.expiryDate
+                            };
                         } else {
-                            showMessage('Error loading card details', 'error');
+                            showMessage(data.message || 'Error loading card details', 'error');
                             return;
                         }
                     } catch (error) {
@@ -1236,15 +1241,20 @@
                 if (!cardCache[cardId]) {
                     try {
                         const headers = await getAuthHeaders();
-                        const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                        const response = await fetch(`${API_URL}/cards/cardDetails/${cardId}`, {
+                            method: 'POST',
                             headers,
                             credentials: 'include'
                         });
                         const data = await response.json();
-                        if (response.ok && data.card) {
-                            cardCache[cardId] = data.card;
+                        if (response.ok && data.success) {
+                            cardCache[cardId] = {
+                                cardNumber: data.cardNumber,
+                                cvv: data.cvv,
+                                expiryDate: data.expiryDate
+                            };
                         } else {
-                            showMessage('Error loading card details', 'error');
+                            showMessage(data.message || 'Error loading card details', 'error');
                             return;
                         }
                     } catch (error) {
@@ -1264,15 +1274,20 @@
             if (!cardCache[cardId]) {
                 try {
                     const headers = await getAuthHeaders();
-                    const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                    const response = await fetch(`${API_URL}/cards/cardDetails/${cardId}`, {
+                        method: 'POST',
                         headers,
                         credentials: 'include'
                     });
                     const data = await response.json();
-                    if (response.ok && data.card) {
-                        cardCache[cardId] = data.card;
+                    if (response.ok && data.success) {
+                        cardCache[cardId] = {
+                            cardNumber: data.cardNumber,
+                            cvv: data.cvv,
+                            expiryDate: data.expiryDate
+                        };
                     } else {
-                        showMessage('Error loading card details', 'error');
+                        showMessage(data.message || 'Error loading card details', 'error');
                         return;
                     }
                 } catch (error) {
@@ -1287,15 +1302,20 @@
             if (!cardCache[cardId]) {
                 try {
                     const headers = await getAuthHeaders();
-                    const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                    const response = await fetch(`${API_URL}/cards/cardDetails/${cardId}`, {
+                        method: 'POST',
                         headers,
                         credentials: 'include'
                     });
                     const data = await response.json();
-                    if (response.ok && data.card) {
-                        cardCache[cardId] = data.card;
+                    if (response.ok && data.success) {
+                        cardCache[cardId] = {
+                            cardNumber: data.cardNumber,
+                            cvv: data.cvv,
+                            expiryDate: data.expiryDate
+                        };
                     } else {
-                        showMessage('Error loading card details', 'error');
+                        showMessage(data.message || 'Error loading card details', 'error');
                         return;
                     }
                 } catch (error) {
@@ -1309,23 +1329,23 @@
         async function editCard(cardId) {
             try {
                 const headers = await getAuthHeaders();
-                const response = await fetch(`${API_URL}/cards/getCardDetails/${cardId}`, {
+                const response = await fetch(`${API_URL}/cards/cardDetails/${cardId}`, {
+                    method: 'POST',
                     headers,
                     credentials: 'include'
                 });
                 
                 const data = await response.json();
-                if (response.ok && data.card) {
-                    const card = data.card;
+                if (response.ok && data.success) {
                     document.getElementById('card-modal-title').textContent = 'Edit Credit Card';
                     document.getElementById('card-id').value = cardId;
-                    document.getElementById('card-name').value = card.cardName;
-                    document.getElementById('card-holder').value = card.cardholderName;
-                    document.getElementById('card-number').value = card.cardNumber;
-                    document.getElementById('card-expiry').value = card.expiryDate;
-                    document.getElementById('card-cvv').value = card.cvv;
-                    document.getElementById('card-type').value = card.cardType;
-                    document.getElementById('card-notes').value = card.notes || '';
+                    document.getElementById('card-name').value = data.cardName;
+                    document.getElementById('card-holder').value = data.cardholderName;
+                    document.getElementById('card-number').value = data.cardNumber;
+                    document.getElementById('card-expiry').value = data.expiryDate;
+                    document.getElementById('card-cvv').value = data.cvv;
+                    document.getElementById('card-type').value = data.cardType;
+                    document.getElementById('card-notes').value = data.notes || '';
                     document.getElementById('card-modal').classList.add('show');
                 } else {
                     showMessage(data.message || 'Error loading card details', 'error');

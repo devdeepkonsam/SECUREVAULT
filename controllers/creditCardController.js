@@ -119,7 +119,11 @@ module.exports = {
                 message: "Card details retrieved.",
                 cardNumber: decryptedNumber,
                 cvv: decryptedCVV,
-                expiryDate: cardData.expiryDate
+                expiryDate: cardData.expiryDate,
+                cardName: cardData.cardName,
+                cardholderName: cardData.cardholderName,
+                cardType: cardData.cardType,
+                notes: cardData.notes || ''
             });
         } catch (error) {
             logger.log('error', `Error: ${error.message}`);
