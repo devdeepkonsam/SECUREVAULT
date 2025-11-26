@@ -35,8 +35,11 @@ app.use(express.json())
 // Clerk middleware for authentication
 app.use(clerkMiddleware())
 
+// API routes BEFORE static files (priority)
+app.use('/api', mainRouter)
+
+// Static files served last
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/', mainRouter)
 
 const PORT = process.env.PORT || 3000
 
