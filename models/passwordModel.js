@@ -30,4 +30,7 @@ const passwordSchema = new mongoose.Schema({
 
 passwordSchema.set('timestamps', true)
 
+// Compound index for faster queries
+passwordSchema.index({ userId: 1, passwordName: 1 });
+
 module.exports = mongoose.model('password', passwordSchema);

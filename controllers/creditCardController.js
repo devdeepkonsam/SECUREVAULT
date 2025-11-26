@@ -69,16 +69,19 @@ module.exports = {
     listCards: async (req, res) => {
         try {
             const userId = req.userId;
-            const cardsData = await creditCardModel.find({ userId: userId })
-                .select('cardName cardholderName cardType expiryDate notes createdAt');
+            // Use lean() for faster query performance
+            const cardsData = await creditCardModel
+                .find({ userId: userId })
+                .select('cardName cardholderName cardType expiryDate notes createdAt')
+                .lean()
+                .exec();
             
-            const cardCount = await creditCardModel.countDocuments({ userId: userId });
             logger.log('info', `Credit cards retrieved for user: ${userId}`);
 
             res.status(200).json({
                 success: true,
                 message: "All credit cards found!",
-                cardCount: cardCount,
+                cardCount: cardsData.length,
                 cardsData: cardsData
             });
         } catch (error) {

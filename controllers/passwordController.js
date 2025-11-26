@@ -63,13 +63,18 @@ module.exports = {
     listPasswords: async (req, res) => {
         try {
             const userId = req.userId;
-            const passwordsData = await passwordModel.find({ userId: userId }).select('passwordName username password')
-            const passwordCount = await passwordModel.countDocuments({ userId: userId })
+            // Use lean() for faster query (returns plain JS objects instead of Mongoose documents)
+            const passwordsData = await passwordModel
+                .find({ userId: userId })
+                .select('passwordName username password')
+                .lean()
+                .exec();
+            
             passwordLogger.log('info', `Passwords retrieved for user: ${userId}`)
             res.status(200).send({
                 success: true,
                 message: "All passwords data found!",
-                passwordCount: passwordCount,
+                passwordCount: passwordsData.length,
                 passwordsData: passwordsData
             })
         } catch (error) {

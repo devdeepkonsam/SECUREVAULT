@@ -843,25 +843,19 @@
             container.innerHTML = '';
 
             try {
-                console.log('Loading passwords...');
-                console.log('Clerk instance:', clerkInstance);
-                console.log('Has session:', !!clerkInstance?.session);
-                
                 const headers = await getAuthHeaders();
-                console.log('Headers obtained, making fetch request');
-                
                 const response = await fetch(`${API_URL}/passwords/listPasswords`, { 
                     headers,
                     credentials: 'include'
                 });
                 
-                console.log('Response status:', response.status);
                 const data = await response.json();
-                console.log('Response data:', data);
-                
                 loading.style.display = 'none';
 
                 if (response.ok && data.passwordsData && data.passwordsData.length > 0) {
+                    // Build HTML string first (faster than multiple DOM operations)
+                    const fragment = document.createDocumentFragment();
+                    
                     data.passwordsData.forEach(pwd => {
                         const item = document.createElement('div');
                         item.className = 'password-item';
@@ -876,8 +870,11 @@
                                 <button class="btn-small btn-danger" onclick="showDeleteConfirmation('${pwd._id}', 'password')">🗑️ Delete</button>
                             </div>
                         `;
-                        container.appendChild(item);
+                        fragment.appendChild(item);
                     });
+                    
+                    // Single DOM update (much faster)
+                    container.appendChild(fragment);
                 } else if (response.ok) {
                     container.innerHTML = '<p>No passwords stored yet.</p>';
                 } else {
@@ -1157,6 +1154,9 @@
                 loading.style.display = 'none';
 
                 if (response.ok && data.cardsData && data.cardsData.length > 0) {
+                    // Build fragment for batch DOM update (faster)
+                    const fragment = document.createDocumentFragment();
+                    
                     data.cardsData.forEach(card => {
                         const item = document.createElement('div');
                         item.className = 'password-item';
@@ -1177,8 +1177,11 @@
                                 <button class="btn-small btn-danger" onclick="showDeleteConfirmation('${card._id}', 'card')">🗑️ Delete</button>
                             </div>
                         `;
-                        container.appendChild(item);
+                        fragment.appendChild(item);
                     });
+                    
+                    // Single DOM update (much faster)
+                    container.appendChild(fragment);
                 } else if (response.ok) {
                     container.innerHTML = '<p>No credit cards stored yet.</p>';
                 } else {
